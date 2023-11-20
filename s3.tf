@@ -1,18 +1,18 @@
 #create s3 bucket
-resource "aws_s3_bucket" "mybucket" {
+resource "aws_s3_bucket" "mybucket-cicd" {
   bucket = var.bucketname
 }
 
-resource "aws_s3_bucket_ownership_controls" "example" {
-  bucket = aws_s3_bucket.mybucket.id
+resource "aws_s3_bucket_ownership_controls" "devops" {
+  bucket = aws_s3_bucket.mybucket-cicd.id
 
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "example" {
-  bucket = aws_s3_bucket.mybucket.id
+resource "aws_s3_bucket_public_access_block" "devops" {
+  bucket = aws_s3_bucket.mybucket-cicd.id
 
   block_public_acls       = false
   block_public_policy     = false
@@ -20,18 +20,18 @@ resource "aws_s3_bucket_public_access_block" "example" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_acl" "example" {
+resource "aws_s3_bucket_acl" "devops" {
   depends_on = [
-    aws_s3_bucket_ownership_controls.example,
-    aws_s3_bucket_public_access_block.example,
+    aws_s3_bucket_ownership_controls.devops,
+    aws_s3_bucket_public_access_block.devops,
   ]
 
-  bucket = aws_s3_bucket.mybucket.id
+  bucket = aws_s3_bucket.mybucket-cicd.id
   acl    = "public-read"
 }
 
 resource "aws_s3_object" "index" {
-  bucket = aws_s3_bucket.mybucket.id
+  bucket = aws_s3_bucket.mybucket-cicd.id
   key = "index.html"
   source = "index.html"
   acl = "public-read"
@@ -39,7 +39,7 @@ resource "aws_s3_object" "index" {
 }
 
 resource "aws_s3_object" "error" {
-  bucket = aws_s3_bucket.mybucket.id
+  bucket = aws_s3_bucket.mybucket-cicd.id
   key = "error.html"
   source = "error.html"
   acl = "public-read"
@@ -47,7 +47,7 @@ resource "aws_s3_object" "error" {
 }
 
 resource "aws_s3_object" "style" {
-  bucket = aws_s3_bucket.mybucket.id
+  bucket = aws_s3_bucket.mybucket-cicd.id
   key = "style.css"
   source = "style.css"
   acl = "public-read"
@@ -55,7 +55,7 @@ resource "aws_s3_object" "style" {
 }
 
 resource "aws_s3_object" "script" {
-  bucket = aws_s3_bucket.mybucket.id
+  bucket = aws_s3_bucket.mybucket-cicd.id
   key = "script.js"
   source = "script.js"
   acl = "public-read"
@@ -63,7 +63,7 @@ resource "aws_s3_object" "script" {
 }
 
 resource "aws_s3_bucket_website_configuration" "website" {
-  bucket = aws_s3_bucket.mybucket.id
+  bucket = aws_s3_bucket.mybucket-cicd.id
   index_document {
     suffix = "index.html"
   }
@@ -72,5 +72,5 @@ resource "aws_s3_bucket_website_configuration" "website" {
     key = "error.html"
   }
 
-  depends_on = [ aws_s3_bucket_acl.example.id ]
+  depends_on = [ aws_s3_bucket_acl.mybucket-cicd.id ]
 }
